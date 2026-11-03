@@ -92,7 +92,7 @@ describe("formatReport", () => {
     [3_599_000, "(59m 59s)"],
     [3_600_000, "(1h 0m 0s)"],
     [4_503_000, "(1h 15m 3s)"],
-  ])("formats a rebuild duration of %i ms as %s", (durationMs, expected) => {
+  ] as const)("formats a rebuild duration of %i ms as %s", (durationMs, expected) => {
     const input = report({
       rebuild: { ...report().rebuild!, durationMs },
     });
