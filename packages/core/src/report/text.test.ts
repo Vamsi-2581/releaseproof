@@ -93,10 +93,36 @@ describe("formatReport", () => {
     [3_600_000, "(1h 0m 0s)"],
     [4_503_000, "(1h 15m 3s)"],
   ] as const)("formats a rebuild duration of %i ms as %s", (durationMs, expected) => {
+    const rebuild = report().rebuild;
+    if (!rebuild) {
+      throw new Error("Test fixture must include a rebuild");
+    }
     const input = report({
-      rebuild: { ...report().rebuild!, durationMs },
+      rebuild: { ...rebuild, durationMs },
     });
     expect(formatReport(input)).toContain(`OK ${expected}`);
+  });
+
+  it("rounds across the hour boundary before formatting", () => {
+    const rebuild = report().rebuild;
+    if (!rebuild) {
+      throw new Error("Test fixture must include a rebuild");
+    }
+    const input = report({ rebuild: { ...rebuild, durationMs: 3_599_600 } });
+
+    expect(formatReport(input)).toContain("OK (1h 0m 0s)");
+  });
+
+  it("formats durations on failed rebuild rows", () => {
+    const rebuild = report().rebuild;
+    if (!rebuild) {
+      throw new Error("Test fixture must include a rebuild");
+    }
+    const input = report({
+      rebuild: { ...rebuild, status: "failed", durationMs: 4_503_000, failure: "build failed" },
+    });
+
+    expect(formatReport(input)).toContain("FAILED (1h 15m 3s)  build failed");
   });
 
   it("links the Rekor transparency log entry of a verified provenance", () => {
