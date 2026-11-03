@@ -75134,7 +75134,15 @@ function duration(ms2) {
     return "";
   }
   const seconds = Math.round(ms2 / 1e3);
-  return seconds >= 60 ? ` (${Math.floor(seconds / 60)}m ${seconds % 60}s)` : ` (${seconds}s)`;
+  if (seconds < 60) {
+    return ` (${seconds}s)`;
+  }
+  if (seconds < 3600) {
+    return ` (${Math.floor(seconds / 60)}m ${seconds % 60}s)`;
+  }
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return ` (${hours}h ${minutes}m ${seconds % 60}s)`;
 }
 function shortRepo(repository) {
   return repository.replace(/^https:\/\/github\.com\//, "");
