@@ -86,6 +86,19 @@ describe("formatReport", () => {
     expect(formatReport(report({ rebuild: undefined }))).not.toContain("image digest");
   });
 
+  it.each([
+    [59_000, "(59s)"],
+    [60_000, "(1m 0s)"],
+    [3_599_000, "(59m 59s)"],
+    [3_600_000, "(1h 0m 0s)"],
+    [4_503_000, "(1h 15m 3s)"],
+  ])("formats a rebuild duration of %i ms as %s", (durationMs, expected) => {
+    const input = report({
+      rebuild: { ...report().rebuild!, durationMs },
+    });
+    expect(formatReport(input)).toContain(`OK ${expected}`);
+  });
+
   it("links the Rekor transparency log entry of a verified provenance", () => {
     const input = report();
     input.provenance.transparencyLog = { logIndex: "3310501741", integratedTime: "1792323552" };
